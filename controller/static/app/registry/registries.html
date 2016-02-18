@@ -1,0 +1,97 @@
+<div class="ui small remove modal transition" style="margin-top: -98px;">
+<i class="close icon"></i>
+<div class="header">
+    删除仓库: {{ vm.selectedRegistry.name }}
+</div>
+<div class="content">
+    <p>你确认要删除此仓库?</p>
+</div>
+<div class="actions">
+    <div class="ui negative button">
+        不，取消
+    </div>
+    <div ng-click="vm.removeRegistry()" class="ui positive right labeled icon button">
+        是的，确认
+        <i class="checkmark icon"></i>
+    </div>
+</div>
+</div>
+
+<div class="ui padded grid">
+    <div class="two column row">
+        <div class="left floated column">
+            <div ng-click="vm.refresh()" class="ui small blue labeled icon button">
+                <i class="refresh icon"></i> 刷新
+            </div>
+            <div ui-sref="dashboard.addRegistry" class="ui small green labeled icon button">
+                <i class="plus icon"></i> 增加仓库
+            </div>
+        </div>
+
+        <div class="right aligned right floated column">
+            <div class="ui small icon input">
+                <input ng-model="tableFilter" placeholder="查询仓库信息..." reset-field/>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" ng-show="vm.registries.length === 0">
+        <div class="column">
+            <div class="ui icon message">
+                <i class="info icon"></i>
+                <div class="content">
+                    <div class="header">
+                        仓库管理
+                    </div>
+                    <p>没有找到任何仓库.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" ng-hide="filteredRegistries.length === 0">
+        <div class="column">
+            <table class="ui sortable celled table">
+                <thead ng-hide="">
+                    <tr>
+                        <th>仓库名称</th>
+                        <th>仓库地址</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="r in filteredRegistries = (vm.registries | filter:tableFilter)">
+                        <td>{{r.name}}</td>
+                        <td>{{r.addr}}</td>
+                        <td class="collapsing">
+                            <div ui-sref="dashboard.inspectRegistry(r)" class="compact ui icon button">
+                                <i class="search icon"></i>
+                            </div>
+                            <div ng-click="vm.showRemoveRegistryDialog(r)" class="compact ui icon button red">
+                                <i class="trash icon"></i>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row" ng-show="vm.registries.length > 0 && filteredContainers.length === 0">
+        <div class="column">
+            <div class="ui icon message">
+                <i class="info icon"></i>
+                <div class="content">
+                    <div class="header">
+                        仓库管理
+                    </div>
+                    <p>没有检索到你想要仓库信息</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+$('.ui.sortable.celled.table').tablesort();
+</script>

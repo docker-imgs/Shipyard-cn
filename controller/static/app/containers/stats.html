@@ -1,0 +1,49 @@
+<div class="ui padded grid">
+<div class="two column row">
+    <div class="left floated column">
+        <h2 class="ui header">
+            <div class="content">
+                状态监控
+                <div class="sub header">容器: {{ vm.id | limitTo:12 }}</div>
+            </div>
+        </h2>
+    </div>
+
+    <div class="right aligned right floated column">
+        <select class="ui compact dropdown" ng-model="vm.refreshInterval">
+            <option value="1">流量</option>
+            <option value="5">5 秒</option>
+            <option value="10">10 秒</option>
+            <option value="30">30 秒</option>
+            <option value="60">1 分钟</option>
+        </select>
+    </div>
+</div>
+
+<div class="row">
+    <div class="column">
+        <div class="ui segment chart" > 
+            <h3 class="ui header">CPU情况</h3>
+            <div id='graphCpuStats' class='chart half with-transitions'>
+                <svg></svg>
+            </div>
+        </div>
+        <div class="ui segment chart" > 
+            <h3 class="ui header">内存情况</h3>
+            <div id='graphMemoryStats' class='chart half with-transitions'>
+                <svg></svg>
+            </div>
+        </div>
+        <div class="ui segment chart" > 
+            <h3 class="ui header">网络情况</h3>
+            <div id='graphNetStats' class='chart half with-transitions'>
+                <svg></svg>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+$('.ui.dropdown').dropdown();
+</script>

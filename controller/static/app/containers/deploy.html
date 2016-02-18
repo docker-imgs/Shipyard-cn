@@ -1,0 +1,356 @@
+<div class="ui active inverted dimmer" ng-show="vm.deploying">
+    <div class="ui text loader">容器构建部署</div>
+</div>
+<div class="ui padded grid">
+<div class="row" ng-hide="vm.deploying">
+    <div class="column">
+        <div class="ui bottom attached active tab segment">
+            <div class="ui error message" ng-show="vm.error">
+                <div class="header">Error...</div>
+                <p>{{vm.error}}</p>
+            </div>
+            <div class="ui form" ng-submit="vm.deploy()">
+                <h3 class="ui header">容器构建部署</h3>
+                <div class="ui two column grid">
+                    <div class="column">
+                        <div class="ui horizontal segment">
+                            <h5 class="ui dividing header">镜像配置</h5>
+                            <div class="two fields">
+                                <div class="field">
+                                    <label>镜像名称
+                                        <i class="blue help circle icon"></i>
+                                        <div class="ui popup" style="max-width: 450px;">
+                                            <h5>镜像名称</h5>
+                                            <p>请输入你想要部署的容器全命名空间.</p>
+                                            <p>Docker 镜像参考规范: <i>registry.myorganization.org:5000/namespace/image-name</i></p>
+                                            <p>规范说明:</p>
+                                            <ul>
+                                                <li><i>registry.myorganization.org:5000</i> 是你要部署容器<b>仓库(registry)</b> 的位置</li>
+                                                <li><i>命名空间：</i> 是一个可选的 <b>命名空间</b> 其可以帮助你规范你的镜像命名</li>
+                                                <li><i>镜像名称：</i> 你想要部署的镜像必须一个唯一的 <b>镜像名称</b> </li>
+                                            </ul>
+                                            <p>当没有定义镜像, Docker 将在 <a href="https://registry.hub.docker.com/" target="_blank">Official Docker Hub</a>中抽取镜像进行部署.
+                                                如果仓库和命名空间都没有正确定义，Docker将选择官方的镜像进行部署</p>
+                                        </div>
+                                    </label>
+                                    <div class="ui corner labeled input">
+                                        <input name="image" class="input" type="text" ng-model="vm.request.Image" placeholder="Image"></input>
+                                        <div class="ui corner label">
+                                            <i class="asterisk icon"></i>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field">
+                                    <label>命令</label>
+                                    <input name="command" class="input" type="text" ng-model="vm.cmd" placeholder="Command"></input>
+                                </div>
+                            </div>
+                            <div class="fields">
+                                <div class="eight wide field">
+                                    <label>主机名称</label>
+                                    <input name="hostname" class="input" type="text" ng-model="vm.request.Hostname" placeholder="Hostname"></input>
+                                </div>
+                                <div class="eight wide field">
+                                    <label>域</label>
+                                    <input name="domainname" class="input" type="text" ng-model="vm.request.Domainname" placeholder="Domain"></input>
+                                </div>
+                            </div>
+                            <h5 class="ui dividing header">环境变量</h5>
+                            <div class="fields">
+                                <div class="seven wide field">
+                                    <label>变量名称</label>
+                                    <input name="variableName" class="input" type="text" ng-model="vm.variableName" placeholder="Environment Variable Name"></input>
+                                </div>
+                                <div class="eight wide field">
+                                    <label>变量值</label>
+                                    <input name="variableValue" class="input" type="text" ng-model="vm.variableValue" placeholder="Environment Variable Value"></input>
+                                </div>
+                                <div class="one wide field">
+                                    <label>&nbsp;</label>
+                                    <div class="ui green icon button" ng-click="vm.pushEnvVar()">
+                                        <i class="add icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="fields" ng-repeat="v in vm.envVars">
+                                <div class="seven wide field">
+                                    <input class="input" type="text" ng-model="v.name"></input>
+                                </div>
+                                <div class="eight wide field">
+                                    <input class="input" type="text" ng-model="v.value"></input>
+                                </div>
+                                <div class="one wide field">
+                                    <div ng-click="vm.removeEnvVar(v)" class="ui red icon button"> 
+                                        <i class="delete icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <h5 class="ui dividing header">存储卷</h5>
+                            <div class="fields">
+                                <div class="seven wide field">
+                                    <label>主机路径</label>
+                                    <input name="hostPath" class="input" type="text" ng-model="vm.hostPath" placeholder="Host Path"></input>
+                                </div>
+                                <div class="eight wide field">
+                                    <label>容器路径</label>
+                                    <input name="containerPath" class="input" type="text" ng-model="vm.containerPath" placeholder="Container Path"></input>
+                                </div>
+                                <div class="one wide field">
+                                    <label>&nbsp;</label>
+                                    <div class="ui green icon button" ng-click="vm.pushVolume()">
+                                        <i class="add icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="fields" ng-repeat="v in vm.volumes">
+                                <div class="seven wide field">
+                                    <input class="input" type="text" ng-model="v.HostPath"></input>
+                                </div>
+                                <div class="eight wide field">
+                                    <input class="input" type="text" ng-model="v.ContainerPath"></input>
+                                </div>
+                                <div class="one wide field">
+                                    <div class="ui red icon button" ng-click="vm.deleteVolume(v)"> 
+                                        <i class="delete icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <h5 class="ui dividing header">容器链接</h5>
+                            <div class="fields">
+                                <div class="seven wide field">
+                                    <label>容器</label>
+                                    <select name="containerToLink" ng-model="vm.containerToLink" class="ui search fluid dropdown">
+                                        <option value="">Container Name</option>
+                                        <option ng-repeat="c in vm.containerLinkNames" value="{{c}}">{{c}}</option>
+                                    </select>
+                                </div>
+                                <div class="eight wide field">
+                                    <label>别名</label>
+                                    <input name="containerToLinkAlias" class="input" type="text" ng-model="vm.containerToLinkAlias" placeholder="Link Alias"></input>
+                                </div>
+                                <div class="one wide field">
+                                    <label>&nbsp;</label>
+                                    <div class="ui green icon button" ng-click="vm.pushLink()">
+                                        <i class="add icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="fields" ng-repeat="l in vm.links">
+                                <div class="seven wide field">
+                                    <input class="input" type="text" ng-model="l.ContainerToLink"></input>
+                                </div>
+                                <div class="eight wide field">
+                                    <input class="input" type="text" ng-model="l.ContainerToLinkAlias"></input>
+                                </div>
+                                <div class="one wide field">
+                                    <div class="ui red icon button" ng-click="vm.removeLink(l)"> 
+                                        <i class="delete icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <h5 class="ui dividing header">容器 DNS</h5>
+                            <div class="fields">
+                                <div class="eleven wide field">
+                                    <input name="containerDns" class="input" type="text" ng-model="vm.containerDns" placeholder="Container DNS"></input> 
+                                </div>
+                                <div class="one wide field">
+                                    <div class="ui green icon button" ng-click="vm.pushDns()">
+                                        <i class="add icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="fields" ng-repeat="d in vm.Dns track by $index">
+                                <div class="eleven wide field">
+                                    <input class="input" type="text" ng-model="d" placeholder="Container DNS"></input>
+                                </div>
+                                <div class="one wide field">
+                                        <div class="ui red icon button" ng-click="vm.removeDns(d)">
+                                            <i class="remove icon"></i>
+                                        </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="ui horizontal segment">
+                            <h5 class="ui dividing header">容器配置</h5>
+                            <div class="field">
+                                <input name="containerName" class="input" type="text" ng-model="vm.containerName" placeholder="Container Name"></input> 
+                            </div>
+                            <h5 class="ui dividing header">资源限制</h5>
+                            <div class="two fields">
+                                <div class="field">
+                                    <label>CPUs限制</label>
+                                    <input name="cpus" class="input" type="text" ng-model="vm.cpuShares" placeholder="1024"></input>
+                                </div>
+                                <div class="field">
+                                    <label>Memory限制 (单位：MB)</label>
+                                    <input name="memory" class="input" type="text" ng-model="vm.memory" placeholder="&infin;"></input>
+                                </div>
+                            </div>
+                            <h5 class="ui dividing header">集群约束</h5>
+                            <div class="fields">
+                                <div class="five wide field">
+                                    <label>约束</label>
+                                    <input name="constraint" class="input" type="text" ng-model="vm.constraintName" placeholder="storage"></input>
+                                </div>
+                                <div class="four wide field">
+                                    <label>规则</label>
+                                    <dropdown class="fluid" ng-model="vm.constraintRule">
+                                    <dropdown-group>==</dropdown-group>
+                                    <dropdown-group>!=</dropdown-group>
+                                    </dropdown>
+                                </div>
+                                <div class="five wide field">
+                                    <label>值</label>
+                                    <input name="constraintValue" class="input" type="text" ng-model="vm.constraintValue" placeholder="ssd"></input>
+                                </div>
+                                <div class="one wide field">
+                                    <label>&nbsp;</label>
+                                    <div class="ui green icon button" ng-click="vm.pushConstraint()">
+                                        <i class="add icon"></i>
+                                    </div>
+                                </div>
+                            </div>  
+                            <div class="fields" ng-repeat="c in vm.constraints">
+                                <div class="five wide field">
+                                    <input name="constraint" class="input" type="text" ng-model="c.ConstraintName" placeholder="storage"></input>
+                                </div>
+                                <div class="four wide field">
+                                    <dropdown class="fluid" ng-model="c.ConstraintRule">
+                                    <dropdown-group>==</dropdown-group>
+                                    <dropdown-group>!=</dropdown-group>
+                                    </dropdown>
+                                </div>
+                                <div class="five wide field">
+                                    <input name="constraintValue" class="input" type="text" ng-model="c.ConstraintValue" placeholder="ssd"></input>
+                                </div>
+                                <div class="one wide field">
+                                    <div class="ui red icon button" ng-click="vm.removeConstraint(c)"> 
+                                        <i class="delete icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <h5 class="ui dividing header">重启策略</h5>
+                            <div class="two fields">
+                                <div class="field">
+                                    <select class="ui fluid dropdown restart-policy" default="0" ng-model="vm.request.HostConfig.RestartPolicy.Name">
+                                        <option value="no">不自动重启</option>
+                                        <option value="on-failure">失败时重启</option>
+                                        <option value="always">永远自动重启</option>
+                                    </select>
+                                </div>
+                                <div class="field" ng-show="vm.request.HostConfig.RestartPolicy.Name == 'on-failure'">
+                                    <input type="number" ng-model="vm.request.HostConfig.RestartPolicy.MaximumRetryCount" placeholder="Maximum restart count">
+                                </div>
+                            </div>
+                            <h5 class="ui dividing header">端口配置</h5>
+                            <div class="field">
+                                <div class="ui toggle checkbox">
+                                    <input type="checkbox" id="exposeAllPorts" ng-model="vm.request.HostConfig.PublishAllPorts">
+                                    <label for="exposeAllPorts">自动暴露所有对外端口
+                                        <i class="blue help circle icon"></i>
+                                        <div class="ui popup" style="width: 400px;">
+                                            <h5>暴露端口</h5>
+                                            <p> 如果选择自动暴露端口，Docker将所有配置的端口在<b>主机</b>上开放访问端口，并且端口将会被任何客户端通过主机所访问
+                                                当使用此选项，Docker将绑定暴露主机端口（49153 and 65535区间）</p>
+                                        </div>
+                                    </label>
+                                    <br/>
+                                </div>
+                            </div>
+                            <div class="fields">
+                                <div class="three wide field">
+                                    <label>容器端口</label>
+                                    <input name="containerPort" class="input" type="text" ng-model="vm.containerPort" placeholder="Container Port"></input>
+                                </div>
+                                <div class="three wide field">
+                                    <label>协议</label>
+                                    <dropdown class="fluid" ng-model="vm.protocol">
+                                    <dropdown-group>TCP</dropdown-group>
+                                    <dropdown-group>UDP</dropdown-group>
+                                    </dropdown>
+                                </div>
+                                <div class="five wide field">
+                                    <label>主机监听地址</label>
+                                    <input name="hostPort" class="input" type="text" ng-model="vm.hostIp" placeholder="0.0.0.0"></input>
+                                </div>
+                                <div class="three wide field">
+                                    <label>主机端口t</label>
+                                    <input name="hostPort" class="input" type="text" ng-model="vm.hostPort" placeholder="Host Port"></input>
+                                </div>
+                                <div class="one wide field">
+                                    <label>&nbsp;</label>
+                                    <div class="ui green icon button" ng-click="vm.pushPort()">
+                                        <i class="add icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="fields" ng-repeat="p in vm.ports">
+                                <div class="three wide field">
+                                    <input name="containerPort" class="input" type="text" ng-model="p.ContainerPort" placeholder="Container Port"></input>
+                                </div>
+                                <div class="three wide field">
+                                    <dropdown class="fluid" ng-model="p.Protocol">
+                                    <dropdown-group>TCP</dropdown-group>
+                                    <dropdown-group>UDP</dropdown-group>
+                                    </dropdown>
+                                </div>
+                                <div class="five wide field">
+                                    <input name="hostIp" class="input" type="text" ng-model="p.HostIp" placeholder="0.0.0.0"></input>
+                                </div>
+                                <div class="three wide field">
+                                    <input name="hostPort" class="input" type="text" ng-model="p.HostPort" placeholder="Host Port"></input>
+                                </div>
+                                <div class="one wide field">
+                                    <div class="ui red icon button" ng-click="vm.removePort(p)">
+                                        <i class="delete icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <h5 class="ui dividing header">高级</h5>
+                            <div class="field">
+                                <div class="ui toggle checkbox" ng-model="vm.request.HostConfig.Privileged">
+                                    <input type="checkbox" id="privileged" ng-model="vm.request.HostConfig.Privileged">
+                                    <label for="privileged">允许容器在特权模式下运行
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui blue submit button" style="margin: 0 0 20px 30px;">
+                        部署
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<script>
+$(function(){
+    $('.ui.form')
+        .form({
+            image: {
+                identifier : 'image',
+                rules: [
+                {
+                    type   : 'empty',
+                    prompt : 'Please enter an image'
+                }
+                ]
+            },
+        });
+
+    $('.help.circle.icon').popup({
+        inline: true,
+        hoverable: true,
+        delay: {
+            show: 150,
+            hide: 400
+        }
+    });
+    $('.ui.dropdown').dropdown();
+    });
+</script>

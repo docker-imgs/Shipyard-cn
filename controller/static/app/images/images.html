@@ -1,0 +1,147 @@
+<div id="remove-modal" class="ui small modal transition">
+    <i class="close icon"></i>
+    <div class="header">
+        删除镜像: {{ vm.selectedImage.Id.substring(0,12) }}
+    </div>
+    <div class="content">
+        <p>你确认删除此镜像?</p>
+    </div>
+    <div class="actions">
+        <div class="ui negative button">
+            不，取消
+        </div>
+        <div ng-click="vm.removeImage()" class="ui positive right labeled icon button">
+            是的，确认
+            <i class="checkmark icon"></i>
+        </div>
+    </div>
+</div>
+
+<div id="pull-modal" class="ui small modal transition">
+    <i class="close icon"></i>
+    <div class="header">
+        下载镜像
+    </div>
+    <div class="content">
+        <div class="ui form">
+            <div class="field">
+                <label>镜像名称</label>
+                <input type="text" ng-model="vm.pullImageName">
+            </div>
+        </div>
+    </div>
+    <div class="actions">
+        <div class="ui negative button">
+            不，取消
+        </div>
+        <div ng-click="vm.pullImage()" class="ui positive right labeled icon button">
+            是的，确认
+            <i class="checkmark icon"></i>
+        </div>
+    </div>
+</div>
+
+<div class="ui padded grid">
+<div class="two column row" ng-hide="vm.pulling">
+    <div class="left floated column">
+        <div ng-click="vm.refresh()" class="ui small blue labeled icon button">
+            <i class="refresh icon"></i> 刷新
+        </div>
+        <div ng-click="vm.showPullImageDialog()" class="ui small green labeled icon button">
+            <i class="download icon"></i> 下载镜像
+        </div>
+    </div>
+    <div class="right aligned right floated column">
+        <div class="ui small icon input">
+            <input ng-model="tableFilter" placeholder="查询镜像..." reset-field/>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="vm.pulling" style="text-align: center;">
+    <div class="six wide column">
+        <div class="ui icon message">
+            <i class="notched circle loading icon"></i>
+            <div class="content">
+                <div class="header">
+                    下载镜像: {{vm.pullImageName}}
+                </div>
+                <p>我们将下载镜像至你的Docker集群.</p>
+                <p>请注意：下载镜像会需要一段事件，下载时间会因你所下载的镜像大小和镜像网速而不同</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="vm.error">
+    <div class="sixteen wide column">
+        <div class="ui error message">
+            <div class="header">错误信息...</div>
+            <p>{{vm.error}}</p>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="vm.images.length === 0">
+    <div class="column">
+        <div class="ui icon message">
+            <i class="info icon"></i>
+            <div class="content">
+                <div class="header">
+                    镜像
+                </div>
+                <p>没有查询到任何镜像.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="filteredImages.length>0 && !vm.pulling">
+    <div class="column">
+        <table class="ui sortable celled table">
+            <thead>
+                <tr>
+                    <th>镜像名称</th>
+                    <th>镜像ID</th>
+                    <th>创建时间</th>
+                    <th>节点</th>
+                    <th>虚拟容量</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="i in filteredImages = (vm.images | filter:tableFilter)">
+                    <td><div class="ui label" ng-repeat="t in i.RepoTags">{{t}}</div></td>
+                    <td>{{i.Id.substring(0,12)}}</td>
+                    <td>{{i.Created * 1000 | date:'yyyy-MM-dd HH:mm:ss Z'}}</td>
+                    <td>{{i.Engine.Name}}</td>
+                    <td>{{i.VirtualSize / 1048576 | number:2}} MB</td>
+                    <td class="collapsing">
+                        <div ng-click="vm.showRemoveImageDialog(i)" class="compact ui icon button red">
+                            <i class="trash icon"></i>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="row" ng-show="vm.images.length > 0 && filteredImages.length === 0">
+    <div class="column">
+        <div class="ui icon message">
+            <i class="info icon"></i>
+            <div class="content">
+                <div class="header">
+                    镜像
+                </div>
+                <p>没有检索到你要的镜像</p>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+$('.ui.sortable.celled.table').tablesort();
+</script>

@@ -1,0 +1,100 @@
+<div id="remove-modal" class="ui small modal transition">
+<i class="close icon"></i>
+<div class="header">
+    删除账户: {{ vm.selectedAccount.username }}
+</div>
+<div class="content">
+    <p>你确认要删除账户?</p>
+</div>
+<div class="actions">
+    <div class="ui negative button">
+        不，取消
+    </div>
+    <div ng-click="vm.removeAccount()" class="ui positive right labeled icon button">
+        是的，确认
+        <i class="checkmark icon"></i>
+    </div>
+</div>
+</div>
+
+<div class="ui padded grid">
+    <div class="two column row">
+        <div class="left floated column">
+            <div ng-click="vm.refresh()" class="ui small blue labeled icon button">
+                <i class="refresh icon"></i> 刷新
+            </div>
+            <div ui-sref="dashboard.addAccount" class="ui small green labeled icon button">
+                <i class="plus icon"></i> 新增账户
+            </div>
+        </div>
+        <div class="right aligned right floated column">
+            <div class="ui small icon input">
+                <input ng-model="tableFilter" placeholder="查询账户信息..." reset-field/>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" ng-show="vm.accounts.length === 0">
+        <div class="column">
+            <div class="ui icon message">
+                <i class="info icon"></i>
+                <div class="content">
+                    <div class="header">
+                        账户信息
+                    </div>
+                    <p>没有查询到账户资料.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" ng-show="filteredAccounts.length>0">
+        <div class="column">
+            <table class="ui sortable celled table" ng-show="vm.accounts">
+                <thead>
+                    <tr>
+                        <th>用户名</th>
+                        <th>姓氏</th>
+                        <th>名字</th>
+                        <th>角色</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="a in filteredAccounts = (vm.accounts | filter:tableFilter)">
+                        <td>{{a.username}}</td>
+                        <td>{{a.first_name}}</td>
+                        <td>{{a.last_name}}</td>
+                        <td><div ng-repeat="r in a.roles" class="ui horizontal label">{{r|roleDisplay}}</div></td>
+                        <td class="collapsing">
+                            <div ui-sref="dashboard.editAccount({username: a.username})" class="compact ui icon button">
+                                <i class="search icon"></i>
+                            </div>
+                            <div ng-click="vm.showRemoveAccountDialog(a)" class="compact ui icon button red">
+                                <i class="trash icon"></i>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row" ng-show="vm.accounts.length > 0 && filteredAccounts.length === 0">
+        <div class="column">
+            <div class="ui icon message">
+                <i class="info icon"></i>
+                <div class="content">
+                    <div class="header">
+                        账户信息
+                    </div>
+                    <p>没有查询到您想要的信息</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+$('.ui.sortable.celled.table').tablesort();
+</script>

@@ -1,0 +1,24 @@
+<div class="ui padded grid">
+<div class="row" ng-hide="vm.logs">
+    <div class="column">
+        <div class="ui icon message">
+            <i class="info icon"></i>
+            <div class="content">
+                <div class="header">
+                    日志信息
+                </div>
+                <p>没有找到有效容器日志.</p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row" ng-show="vm.logs">
+    <div class="column">
+        <div class="ui segment page" > 
+            <h4 class="dividing header">容器: {{ vm.id | limitTo:12 }}</h2>
+            <pre ng-bind-html="vm.logs" class="logs"> 
+            </pre>
+        </div>
+    </div>
+</div>
+</div>
