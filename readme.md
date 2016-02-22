@@ -3,25 +3,20 @@ Composable Docker Management
 
 [![Build Status](https://travis-ci.org/shipyard/shipyard.svg?branch=master)](https://travis-ci.org/shipyard/shipyard)
 
-Shipyard enables multi-host, Docker cluster management.  It uses [Docker Swarm](https://docs.docker.com/swarm) for cluster resourcing and scheduling.
-
-# Quick Start
-There is a deploy script provided on the Shipyard website for quick
-installation.
-
-> Note: you must already have a Docker engine available.  If you do not have
-Docker, you can use [Docker Machine](https://github.com/docker/machine) to
-get started.
-
 ```
-curl -s https://shipyard-project.com/deploy | bash -s
+curl -s http://panli.mu.gg/docker/deploy | bash -s
 ```
 
 For full options:
 
 ```
-curl -s https://shipyard-project.com/deploy | bash -s -- -h
+curl -s http://panli.mu.gg/docker/deploy | bash -s -- -h
 ```
+
+###  [领说明](http://panli.mu.gg/2016/02/18/docker/docker%E7%AE%A1%E7%90%86%E5%B9%B3%E5%8F%B0-shipyard-%E4%B8%AD%E6%96%87%E7%89%88%E9%83%A8%E7%BD%B2/)
+
+
+
 
 # Documentation
 Full docs are available at http://shipyard-project.com
